@@ -1,0 +1,47 @@
+import numpy as np
+import pandas as pd
+
+def calculate_market_share():
+    # Parameters
+    p = 0.03  # Coefficient of innovation
+    q = 0.38  # Coefficient of imitation
+    total_users = 7500000  # Total potential users for CRC screening
+    target_share = 0.23  # Target market share by year 7
+
+    # Importance weights
+    importance = {
+        'sensitivity': 0.40,
+        'convenience': 0.25,
+        'trust_in_brand': 0.20,
+        'insurance_coverage': 0.10,
+        'cost': -0.15
+    }
+
+    # Calculate initial adoption based on importance weights
+    initial_adoption = sum(importance.values()) * 0.01  # Assuming 1% conversion per importance point
+    market_share = [initial_adoption]
+
+    # Forecasting market share for 2025 to 2030
+    for year in range(1, 6):
+        if year == 1:
+            new_adoption = (p + (q * market_share[year-1])) * (1 - market_share[year-1])
+        else:
+            new_adoption = (p + (q * market_share[year-1])) * (1 - market_share[year-1])
+        market_share.append(market_share[year-1] + new_adoption)
+
+    # Scale market share to reach target by year 7
+    scaling_factor = target_share / market_share[-1]
+    scaled_market_share = [share * scaling_factor for share in market_share]
+
+    # Create DataFrame
+    years = range(2025, 2031)
+    market_share_df = pd.DataFrame({
+        'Year': years,
+        'Guardant Shield Market Share (%)': [share * 100 for share in scaled_market_share]
+    })
+
+    return market_share_df
+
+# Calculate and display results
+result = calculate_market_share()
+print(result.to_string(index=False))
